@@ -10,20 +10,20 @@ namespace FruitMachine
     {
         public int ShowResult(List<string[]> reels, int[] spins)
         {
-            var reelOneItem = reels[0][spins[0]];
-            var reelTwoItem = reels[1][spins[1]];
-            var reelThreeItem = reels[2][spins[2]];
+            var firstReelResult = reels[0][spins[0]];
+            var secondReelResult = reels[1][spins[1]];
+            var thirdReelResult = reels[2][spins[2]];
 
-            if (reelOneItem == "Wild" && reelTwoItem == "Wild" && reelThreeItem == "Wild")
+            if (firstReelResult == secondReelResult && secondReelResult == thirdReelResult)
             {
-                return 100;
+                return AllResultAreSameLookUp[firstReelResult];
             }
-            else if (reelOneItem == "Jack" && reelTwoItem == "Jack" && reelThreeItem == "Jack")
-            {
-                return 10;
-            }
-
             return 0;
         }
+
+        private readonly Dictionary<string, int> AllResultAreSameLookUp = new Dictionary<string, int>()
+        {
+            {"Wild",100 },{"Star",90},{"Bell",80},{"Shell",70},{"Seven",60},{"Cherry",50},{"Bar",40},{"King",30},{"Queen",20},{"Jack",10}
+        };
     }
 }
