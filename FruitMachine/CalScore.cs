@@ -15,32 +15,36 @@ namespace FruitMachine
             var secondReelResult = reels[1][spins[1]];
             var thirdReelResult = reels[2][spins[2]];
 
-            var reelResultList = new List<string>() { firstReelResult, secondReelResult, thirdReelResult };
-            var sameItemList = GetSameItemList(reelResultList);
+            var reelResultList = new List<string> { firstReelResult, secondReelResult, thirdReelResult };
+            var sameItemInfo = GroupSameItem(reelResultList);
 
-            if (firstReelResult == secondReelResult && secondReelResult == thirdReelResult)
+            foreach (var item in sameItemInfo)
             {
-                return ItemScoreLookUp[firstReelResult] * (int)ScoreBonus.AllItemsAreSame;
-            }
-            else if (reelResultList.Contains("Wild") && sameItemList.Any())
-            {
-                if (sameItemList.Contains("Wild"))
+                switch (item.Amount)
                 {
-                    return 10;
+                    case 2 when item.Name == "Wild":
+                        return 10;
+
+                    case 3:
+                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.AllItemsAreSame;
+
+                    default:
+                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.TwoSameItemPlusWild;
                 }
-
-                return ItemScoreLookUp[sameItemList[0]] * (int)ScoreBonus.TwoSameItemPlusWild;
             }
-
             return 0;
         }
 
-        private List<string> GetSameItemList(List<string> reelResultList)
+        private List<Item> GroupSameItem(List<string> reelResultList)
         {
-            return reelResultList.GroupBy(x => x).Where(i => i.Count() > 1).Select(i => i.ElementAt(0)).ToList();
+            //return reelResultList.GroupBy(x => x).All(g => g.Count() > 1).ToString();
+
+            return reelResultList.GroupBy(x => x)
+                .Where(y => y.Count() > 1)
+                .Select(x => new Item { Name = x.Key, Amount = x.Count() }).ToList();
         }
 
-        private readonly Dictionary<string, int> ItemScoreLookUp = new Dictionary<string, int>()
+        private readonly Dictionary<string, int> ItemScoringLookUp = new Dictionary<string, int>()
         {
             {"Wild",10 },{"Star",9},{"Bell",8},{"Shell",7},{"Seven",6},{"Cherry",5},{"Bar",4},{"King",3},{"Queen",2},{"Jack",1}
         };
@@ -50,5 +54,11 @@ namespace FruitMachine
             AllItemsAreSame = 10,
             TwoSameItemPlusWild = 2
         }
+    }
+
+    public class Item
+    {
+        public string Name { get; set; }
+        public int Amount { get; set; }
     }
 }
