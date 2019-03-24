@@ -18,6 +18,11 @@ namespace FruitMachine
             {
                 return 100;
             }
+            else if (reelOneItem == "Jack" && reelTwoItem == "Jack" && reelThreeItem == "Jack")
+            {
+                return 10;
+            }
+
             return 0;
         }
     }
