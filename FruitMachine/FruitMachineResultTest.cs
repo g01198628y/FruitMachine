@@ -37,5 +37,17 @@ namespace FruitMachine
             int[] spins = new int[] { 5, 5, 5 };
             Assert.AreEqual(50, score.ShowResult(reels, spins));
         }
+
+        [TestMethod]
+        public void FruitMachine_No_Matching_Items_Should_Return_0()
+        {
+            var score = new CalScore();
+            string[] reel1 = new string[] { "Wild", "Star", "Bell", "Shell", "Seven", "Cherry", "Bar", "King", "Queen", "Jack" };
+            string[] reel2 = new string[] { "Bar", "Wild", "Queen", "Bell", "King", "Seven", "Cherry", "Jack", "Star", "Shell" };
+            string[] reel3 = new string[] { "Bell", "King", "Wild", "Bar", "Seven", "Jack", "Shell", "Cherry", "Queen", "Star" };
+            List<string[]> reels = new List<string[]> { reel1, reel2, reel3 };
+            int[] spins = new int[] { 5, 4, 3 };
+            Assert.AreEqual(0, score.ShowResult(reels, spins));
+        }
     }
 }
