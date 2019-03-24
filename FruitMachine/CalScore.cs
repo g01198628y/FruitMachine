@@ -24,6 +24,11 @@ namespace FruitMachine
             }
             else if (reelResultList.Contains("Wild") && sameItemList.Any())
             {
+                if (sameItemList.Contains("Wild"))
+                {
+                    return 10;
+                }
+
                 return ItemScoreLookUp[sameItemList[0]] * (int)ScoreBonus.TwoSameItemPlusWild;
             }
 
