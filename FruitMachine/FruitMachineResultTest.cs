@@ -85,5 +85,16 @@ namespace FruitMachine
             int[] spins = new int[] { 0, 1, 1 };
             Assert.AreEqual(10, score.ShowResult(reels, spins));
         }
+
+        [TestMethod]
+        public void FruitMachine_Two_King_One_Bell_Should_Return_3()
+        {
+            var score = new CalScore();
+            string[] reel1 = new string[] { "King", "Cherry", "Bar", "Jack", "Seven", "Queen", "Star", "Shell", "Bell", "Wild" };
+            string[] reel2 = new string[] { "Bell", "Seven", "Jack", "Queen", "Bar", "Star", "Shell", "Wild", "Cherry", "King" };
+            string[] reel3 = new string[] { "Wild", "King", "Queen", "Seven", "Star", "Bar", "Shell", "Cherry", "Jack", "Bell" }; List<string[]> reels = new List<string[]> { reel1, reel2, reel3 };
+            int[] spins = new int[] { 0, 0, 1 };
+            Assert.AreEqual(3, score.ShowResult(reels, spins));
+        }
     }
 }

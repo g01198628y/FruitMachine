@@ -15,30 +15,31 @@ namespace FruitMachine
             var secondReelResult = reels[1][spins[1]];
             var thirdReelResult = reels[2][spins[2]];
 
-            var reelResultList = new List<string> { firstReelResult, secondReelResult, thirdReelResult };
-            var sameItemInfo = GroupSameItem(reelResultList);
+            var reelResult = new List<string> { firstReelResult, secondReelResult, thirdReelResult };
+            var repeatItemInfo = GetRepeatItemInfo(reelResult);
 
-            foreach (var item in sameItemInfo)
+            foreach (var item in repeatItemInfo)
             {
                 switch (item.Amount)
                 {
-                    case 2 when item.Name == "Wild":
-                        return 10;
-
                     case 3:
                         return ItemScoringLookUp[item.Name] * (int)ScoreBonus.AllItemsAreSame;
 
-                    default:
-                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.TwoSameItemPlusWild;
+                    case 2 when item.Name == "Wild":
+                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.TwoWildOneOther;
+
+                    case 2 when reelResult.Contains("Wild"):
+                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.TwoRepeatItemPlusWild;
+
+                    case 2:
+                        return ItemScoringLookUp[item.Name];
                 }
             }
             return 0;
         }
 
-        private List<Item> GroupSameItem(List<string> reelResultList)
+        private List<Item> GetRepeatItemInfo(List<string> reelResultList)
         {
-            //return reelResultList.GroupBy(x => x).All(g => g.Count() > 1).ToString();
-
             return reelResultList.GroupBy(x => x)
                 .Where(y => y.Count() > 1)
                 .Select(x => new Item { Name = x.Key, Amount = x.Count() }).ToList();
@@ -51,8 +52,9 @@ namespace FruitMachine
 
         private enum ScoreBonus
         {
+            TwoWildOneOther = 1,
+            TwoRepeatItemPlusWild = 2,
             AllItemsAreSame = 10,
-            TwoSameItemPlusWild = 2
         }
     }
 
