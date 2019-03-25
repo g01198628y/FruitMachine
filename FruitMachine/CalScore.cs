@@ -11,13 +11,13 @@ namespace FruitMachine
     {
         public int ShowResult(List<string[]> reels, int[] spins)
         {
-            var firstReelResult = reels[0][spins[0]];
-            var secondReelResult = reels[1][spins[1]];
-            var thirdReelResult = reels[2][spins[2]];
+            var reelResult = new List<string>();
+            for (var i = 0; i < reels.Count(); i++)
+            {
+                reelResult.Add(reels[i][spins[i]]);
+            }
 
-            var reelResult = new List<string> { firstReelResult, secondReelResult, thirdReelResult };
             var repeatItemInfo = GetRepeatItemInfo(reelResult);
-
             foreach (var item in repeatItemInfo)
             {
                 switch (item.Amount)
