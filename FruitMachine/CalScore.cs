@@ -17,14 +17,19 @@ namespace FruitMachine
                 reelResult.Add(reels[i][spins[i]]);
             }
 
-            var itemGroupInfo = ClassifyItem(reelResult);
+            var repeatItem = GetRepeatItem(reelResult);
             var scoreBonus = GetScoreBonus(reelResult);
+            return CalculateScore(repeatItem, scoreBonus);
+        }
 
-            foreach (var item in itemGroupInfo)
-            {
-                return CalculateScore(item, scoreBonus);
-            }
-            return 0;
+        private string GetRepeatItem(List<string> reelResult)
+        {
+            return hasRepeatItem(reelResult) ? reelResult.GroupBy(x => x).SelectMany(grp => grp.Skip(1)).ToList()[0] : "NoRepeatItem";
+        }
+
+        private bool hasRepeatItem(List<string> reelResult)
+        {
+            return reelResult.Count != reelResult.Distinct().ToList().Count;
         }
 
         private int GetScoreBonus(List<string> reelResult)
@@ -48,16 +53,15 @@ namespace FruitMachine
                             case 1:
                                 return 2;
                         }
-
-                        break;
+                        return 1;
                 }
             }
-            return 1;
+            return 0;
         }
 
-        private int CalculateScore(Item item, int bonus)
+        private int CalculateScore(string repeatItem, int bonus)
         {
-            return ItemScoringLookUp[item.Name] * bonus;
+            return ItemScoringLookUp[repeatItem] * bonus;
         }
 
         private int GetWildRepeatNum(List<string> reelResult)
@@ -74,7 +78,7 @@ namespace FruitMachine
 
         private readonly Dictionary<string, int> ItemScoringLookUp = new Dictionary<string, int>()
         {
-            {"Wild",10 },{"Star",9},{"Bell",8},{"Shell",7},{"Seven",6},{"Cherry",5},{"Bar",4},{"King",3},{"Queen",2},{"Jack",1}
+            {"Wild",10 },{"Star",9},{"Bell",8},{"Shell",7},{"Seven",6},{"Cherry",5},{"Bar",4},{"King",3},{"Queen",2},{"Jack",1},{"NoRepeatItem",0}
         };
 
         private enum ScoreBonus
