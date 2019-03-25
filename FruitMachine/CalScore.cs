@@ -17,28 +17,55 @@ namespace FruitMachine
                 reelResult.Add(reels[i][spins[i]]);
             }
 
-            var repeatItemInfo = GetRepeatItemInfo(reelResult);
-            foreach (var item in repeatItemInfo)
+            var itemGroupInfo = ClassifyItem(reelResult);
+            var scoreBonus = GetScoreBonus(reelResult);
+
+            foreach (var item in itemGroupInfo)
             {
-                switch (item.Amount)
-                {
-                    case 3:
-                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.AllItemsAreSame;
-
-                    case 2 when item.Name == "Wild":
-                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.TwoWildOneOther;
-
-                    case 2 when reelResult.Contains("Wild"):
-                        return ItemScoringLookUp[item.Name] * (int)ScoreBonus.TwoRepeatItemPlusWild;
-
-                    case 2:
-                        return ItemScoringLookUp[item.Name];
-                }
+                return CalculateScore(item, scoreBonus);
             }
             return 0;
         }
 
-        private List<Item> GetRepeatItemInfo(List<string> reelResultList)
+        private int GetScoreBonus(List<string> reelResult)
+        {
+            var wildRepeatNum = GetWildRepeatNum(reelResult);
+            var itemGroupInfo = ClassifyItem(reelResult);
+
+            foreach (var item in itemGroupInfo)
+            {
+                switch (item.Amount)
+                {
+                    case 3:
+                        return 10;
+
+                    case 2:
+                        switch (wildRepeatNum)
+                        {
+                            case 2:
+                                return 1;
+
+                            case 1:
+                                return 2;
+                        }
+
+                        break;
+                }
+            }
+            return 1;
+        }
+
+        private int CalculateScore(Item item, int bonus)
+        {
+            return ItemScoringLookUp[item.Name] * bonus;
+        }
+
+        private int GetWildRepeatNum(List<string> reelResult)
+        {
+            return reelResult.FindAll(x => x == "Wild").Count();
+        }
+
+        private List<Item> ClassifyItem(List<string> reelResultList)
         {
             return reelResultList.GroupBy(x => x)
                 .Where(y => y.Count() > 1)
