@@ -11,11 +11,7 @@ namespace FruitMachine
     {
         public int ShowResult(List<string[]> reels, int[] spins)
         {
-            var reelResult = new List<string>();
-            for (var i = 0; i < reels.Count(); i++)
-            {
-                reelResult.Add(reels[i][spins[i]]);
-            }
+            var reelResult = reels.Select((r, i) => r[spins[4]]).ToList();
 
             var repeatItem = GetRepeatItem(reelResult);
             var scoreBonus = GetScoreBonus(reelResult);
