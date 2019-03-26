@@ -12,52 +12,48 @@ namespace FruitMachine
         public int ShowResult(List<string[]> reels, int[] spins)
         {
             var reelResult = reels.Select((r, i) => r[spins[i]]).ToList();
-
-            var repeatItem = GetRepeatItem(reelResult);
-            var scoreBonus = GetScoreBonus(reelResult);
-            return CalculateScore(repeatItem, scoreBonus);
+            return CalculateScore(reelResult);
         }
 
-        private string GetRepeatItem(List<string> reelResult)
-        {
-            return hasRepeatItem(reelResult) ? reelResult.GroupBy(x => x).SelectMany(grp => grp.Skip(1)).ToList()[0] : "NoRepeatItem";
-        }
-
-        private bool hasRepeatItem(List<string> reelResult)
-        {
-            return reelResult.Count != reelResult.Distinct().ToList().Count;
-        }
-
-        private int GetScoreBonus(List<string> reelResult)
+        private int CalculateScore(List<string> reelResult)
         {
             var wildRepeatNum = GetWildRepeatNum(reelResult);
-            var itemGroupInfo = ClassifyItem(reelResult);
+            var classifiedItem = ClassifyItem(reelResult);
 
-            foreach (var item in itemGroupInfo)
+            var score = 0;
+            foreach (var item in classifiedItem)
             {
-                switch (item.Amount)
+                switch ((GroupInfo)item.Amount)
                 {
-                    case 3:
-                        return 10;
+                    case GroupInfo.ThreeOfSame:
+                        score += GetScore(item.Name, Bonus.ThreeOfSame);
+                        break;
 
-                    case 2:
-                        switch (wildRepeatNum)
+                    case GroupInfo.TwoOfSame:
+                        switch ((WildAmount)wildRepeatNum)
                         {
-                            case 2:
-                                return 1;
+                            case WildAmount.TwoWild:
+                                score += GetScore(item.Name, Bonus.TwoWildOneOther);
+                                break;
 
-                            case 1:
-                                return 2;
+                            case WildAmount.OneWild:
+                                score += GetScore(item.Name, Bonus.TwoOfSameOneWild);
+                                break;
+
+                            case WildAmount.NoWild:
+                                score += GetScore(item.Name, Bonus.TwoOfSameNoWild);
+                                break;
                         }
-                        return 1;
+                        break;
                 }
+                break;
             }
-            return 0;
+            return score;
         }
 
-        private int CalculateScore(string repeatItem, int bonus)
+        private int GetScore(string itemName, Bonus bonus)
         {
-            return ItemScoringLookUp[repeatItem] * bonus;
+            return ItemScoringLookUp[itemName] * (int)bonus;
         }
 
         private int GetWildRepeatNum(List<string> reelResult)
@@ -74,14 +70,28 @@ namespace FruitMachine
 
         private readonly Dictionary<string, int> ItemScoringLookUp = new Dictionary<string, int>()
         {
-            {"Wild",10 },{"Star",9},{"Bell",8},{"Shell",7},{"Seven",6},{"Cherry",5},{"Bar",4},{"King",3},{"Queen",2},{"Jack",1},{"NoRepeatItem",0}
+            {"Wild",10 },{"Star",9},{"Bell",8},{"Shell",7},{"Seven",6},{"Cherry",5},{"Bar",4},{"King",3},{"Queen",2},{"Jack",1}
         };
 
-        private enum ScoreBonus
+        private enum GroupInfo
+        {
+            ThreeOfSame = 3,
+            TwoOfSame = 2,
+        }
+
+        private enum Bonus
         {
             TwoWildOneOther = 1,
-            TwoRepeatItemPlusWild = 2,
-            AllItemsAreSame = 10,
+            TwoOfSameNoWild = 1,
+            TwoOfSameOneWild = 2,
+            ThreeOfSame = 10
+        }
+
+        private enum WildAmount
+        {
+            NoWild,
+            OneWild,
+            TwoWild
         }
     }
 
