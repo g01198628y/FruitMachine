@@ -53,7 +53,7 @@ namespace FruitMachine
 
         private int GetScore(string itemName, Bonus bonus)
         {
-            return ItemScoringLookUp[itemName] * (int)bonus;
+            return _itemScoringLookUp[itemName] * (int)bonus;
         }
 
         private int GetWildRepeatNum(List<string> reelResult)
@@ -68,9 +68,18 @@ namespace FruitMachine
                 .Select(x => new Item { Name = x.Key, Amount = x.Count() }).ToList();
         }
 
-        private readonly Dictionary<string, int> ItemScoringLookUp = new Dictionary<string, int>()
+        private readonly Dictionary<string, int> _itemScoringLookUp = new Dictionary<string, int>()
         {
-            {"Wild",10 },{"Star",9},{"Bell",8},{"Shell",7},{"Seven",6},{"Cherry",5},{"Bar",4},{"King",3},{"Queen",2},{"Jack",1}
+            { "Wild",10 },
+            { "Star",9},
+            { "Bell",8},
+            { "Shell",7},
+            { "Seven",6},
+            { "Cherry",5},
+            { "Bar",4},
+            { "King",3},
+            { "Queen",2},
+            { "Jack",1}
         };
 
         private enum GroupInfo
